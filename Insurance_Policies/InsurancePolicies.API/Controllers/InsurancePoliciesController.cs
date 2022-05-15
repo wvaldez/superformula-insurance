@@ -1,4 +1,5 @@
 ﻿using InsurancePolicies.API.Models;
+using InsurancePolicies.API.Validators;
 using InsurancePolicies.Core.Entities;
 using InsurancePolicies.Core.IRepositories;
 using Microsoft.AspNetCore.Http;
@@ -27,7 +28,11 @@ namespace InsurancePolicies.API.Controllers
         {
             try
             {
-                //TODO: Add validators
+                var validator = new InsurancePolicyValidator().Validate(policyRequest.InsurancePolicy);
+                if (!validator.IsValid)
+                {
+                    return BadRequest(validator.Errors);
+                }
                 await _insurancePolicyRepository.AddAsync(policyRequest.InsurancePolicy);
                 await _insurancePolicyRepository.SaveAsync();
                 return Ok(policyRequest);
