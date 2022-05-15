@@ -4,7 +4,7 @@ using System;
 
 namespace InsurancePolicies.API.Validators
 {
-    public class InsurancePolicyValidator: AbstractValidator<InsurancePolicy>
+    public class InsurancePolicyValidator : AbstractValidator<InsurancePolicy>
     {
         public InsurancePolicyValidator()
         {
@@ -15,6 +15,8 @@ namespace InsurancePolicies.API.Validators
                    context.AddFailure("The effective date must be at least 30 days in the future");
                }
            });
+
+            RuleFor(x => x.VehicleDetail.Year).LessThan(1998).WithMessage("Classic vehicle not meet");
         }
     }
 }
