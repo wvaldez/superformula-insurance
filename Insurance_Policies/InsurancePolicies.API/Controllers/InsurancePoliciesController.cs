@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace InsurancePolicies.API.Controllers
@@ -34,7 +35,7 @@ namespace InsurancePolicies.API.Controllers
                 var validator = new InsurancePolicyValidator().Validate(policyRequest.InsurancePolicy);
                 if (!validator.IsValid)
                 {
-                    return BadRequest(validator.Errors);
+                    return BadRequest(validator.Errors.Select(x => x.ErrorMessage));
                 }
 
                 var stateRegulationResult = await _stateRegulator.ValidRegulation(policyRequest.InsurancePolicy);
@@ -56,12 +57,20 @@ namespace InsurancePolicies.API.Controllers
 
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<InsurancePolicy>>> Get()
+        [HttpGet("licensenumber/{licenseNumber}")]
+        public async Task<ActionResult<List<InsurancePolicy>>> GetPoliciesByLicenseNumber(string licenseNumber, [FromQuery] bool sortByYear = false, [FromQuery] bool includeExpiredPolicies = false)
         {
             try
             {
-                var result = _insurancePolicyRepository.GetAll();
+                var result = _insurancePolicyRepository.GetAll().Where(x => x.LicenseNumber.Equals(licenseNumber));
+                if (sortByYear)
+                {
+                    result = result.OrderBy(x => x.VehicleDetail.Year);
+                }
+                if (includeExpiredPolicies)
+                {
+                    result = result.Where(x => x.ExpirationDate > DateTime.Now);
+                }
                 return Ok(result);
             }
             catch (Exception ex)
@@ -71,13 +80,13 @@ namespace InsurancePolicies.API.Controllers
             }
         }
 
-        [HttpGet("{policyId}")]
-        public async Task<ActionResult<InsurancePolicy>> Get(int policyId)
+        [HttpGet("id/{policyId}/licenseNumber/{licenseNumber}")]
+        public async Task<ActionResult<InsurancePolicy>> Get(int policyId, string licenseNumber)
         {
             try
             {
-                var result = await _insurancePolicyRepository.GetAsync(policyId);
-                if(result == null)
+                var result = _insurancePolicyRepository.GetAll().Where(x => x.LicenseNumber.Equals(licenseNumber) && x.Id == policyId).FirstOrDefault();
+                if (result == null)
                 {
                     return NotFound();
                 }

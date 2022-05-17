@@ -9,10 +9,10 @@ namespace InsurancePolicies.API.Services
     {
         public Task<StateRegulationResult> ValidRegulation(InsurancePolicy policy)
         {
-            var validationResult = new StateRegulationResult() { Reason = "Failed regulation due to invalid data", Status = false }; ;
+            var validationResult = new StateRegulationResult { Reason = "Failed regulation due to invalid data", Status = false };
             if (new Random().Next(1, 2) == 1)
             {
-                validationResult = new StateRegulationResult() { Reason = "Success regulation due to valid data", Status = true };
+                validationResult = new StateRegulationResult { Reason = "Success regulation due to valid data", Status = true };
             }
 
             return Task.FromResult(validationResult);
