@@ -1,3 +1,4 @@
+using InsurancePolicies.API.Services;
 using InsurancePolicies.Core.IRepositories;
 using InsurancePolicies.Infrastructure.Database;
 using InsurancePolicies.Infrastructure.Database.Repositories;
@@ -32,6 +33,7 @@ namespace InsurancePolicies.API
         {
             services.AddScoped<IInsurancePolicyRepository, InsurancePolicyRepository>();
             services.AddScoped<IInsuranceDbContext,InsuranceDbContext>();
+            services.AddScoped<IStateRegulator, StateRegulator>();
 
             services.AddDbContext<InsuranceDbContext>(options => options.UseInMemoryDatabase("insurancedb"));
             

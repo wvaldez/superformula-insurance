@@ -1,4 +1,5 @@
 ﻿using InsurancePolicies.API.Models;
+using InsurancePolicies.API.Services;
 using InsurancePolicies.API.Validators;
 using InsurancePolicies.Core.Entities;
 using InsurancePolicies.Core.IRepositories;
@@ -17,10 +18,12 @@ namespace InsurancePolicies.API.Controllers
     {
         private readonly ILogger<InsurancePoliciesController> _logger;
         private readonly IInsurancePolicyRepository _insurancePolicyRepository;
-        public InsurancePoliciesController(ILogger<InsurancePoliciesController> logger, IInsurancePolicyRepository insurancePolicyRepository)
+        private readonly IStateRegulator _stateRegulator;
+        public InsurancePoliciesController(ILogger<InsurancePoliciesController> logger, IInsurancePolicyRepository insurancePolicyRepository, IStateRegulator stateRegulator)
         {
             _logger = logger;
             _insurancePolicyRepository = insurancePolicyRepository;
+            _stateRegulator = stateRegulator;
         }
 
         [HttpPost]
@@ -33,6 +36,14 @@ namespace InsurancePolicies.API.Controllers
                 {
                     return BadRequest(validator.Errors);
                 }
+
+                var stateRegulationResult = await _stateRegulator.ValidRegulation(policyRequest.InsurancePolicy);
+                if (!stateRegulationResult.Status)
+                {
+                    _logger.LogError($"Error at state regulation validation");
+                    return BadRequest("Error at state regulation validation");
+                }
+
                 await _insurancePolicyRepository.AddAsync(policyRequest.InsurancePolicy);
                 await _insurancePolicyRepository.SaveAsync();
                 return Ok(policyRequest);
