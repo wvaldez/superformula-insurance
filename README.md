@@ -44,4 +44,4 @@ Productionizing the API will need the CI/CD part to handle deployments. In terms
 Deployment into Azure involves a few resources needed. 
 - API / It can be deployed into an App Service, also this can be added simply to the CI/CD pipelines using the web deploy task 
 - Database / It can be deployed into an Azure SQL Database, the task that run migrations, must be included in the pipelines.
-- Service Bus / It is necessary to create a Service Bus, and make the necessary configuration to handle handle the messages
+- Service Bus / It is necessary to create a Service Bus, and make the necessary configuration to handle the messages
