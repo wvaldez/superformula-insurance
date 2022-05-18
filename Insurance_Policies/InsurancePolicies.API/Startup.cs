@@ -1,3 +1,4 @@
+using Azure.Messaging.ServiceBus;
 using InsurancePolicies.API.Services;
 using InsurancePolicies.Core.IRepositories;
 using InsurancePolicies.Infrastructure.Database;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,11 +34,25 @@ namespace InsurancePolicies.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IInsurancePolicyRepository, InsurancePolicyRepository>();
-            services.AddScoped<IInsuranceDbContext,InsuranceDbContext>();
+            services.AddScoped<IInsuranceDbContext, InsuranceDbContext>();
             services.AddScoped<IStateRegulator, StateRegulator>();
 
+            services.AddAzureClients(builder =>
+            {
+                builder.AddServiceBusClient(Configuration.GetValue<string>("ServiceBus:ConnectionString"))
+                .ConfigureOptions(options =>
+                {
+                    options.RetryOptions.Delay = TimeSpan.FromMilliseconds(50);
+                    options.RetryOptions.MaxDelay = TimeSpan.FromSeconds(5);
+                    options.RetryOptions.MaxRetries = 3;
+                });
+            });
+
+
+            services.AddSingleton<IMessagePublisher, MessagePublisher>();
+
             services.AddDbContext<InsuranceDbContext>(options => options.UseInMemoryDatabase("insurancedb"));
-            
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

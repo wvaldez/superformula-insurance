@@ -20,11 +20,13 @@ namespace InsurancePolicies.API.Controllers
         private readonly ILogger<InsurancePoliciesController> _logger;
         private readonly IInsurancePolicyRepository _insurancePolicyRepository;
         private readonly IStateRegulator _stateRegulator;
-        public InsurancePoliciesController(ILogger<InsurancePoliciesController> logger, IInsurancePolicyRepository insurancePolicyRepository, IStateRegulator stateRegulator)
+        private readonly IMessagePublisher _messagePublisher;
+        public InsurancePoliciesController(ILogger<InsurancePoliciesController> logger, IInsurancePolicyRepository insurancePolicyRepository, IStateRegulator stateRegulator, IMessagePublisher messagePublisher)
         {
             _logger = logger;
             _insurancePolicyRepository = insurancePolicyRepository;
             _stateRegulator = stateRegulator;
+            _messagePublisher = messagePublisher;
         }
 
         [HttpPost]
@@ -47,6 +49,8 @@ namespace InsurancePolicies.API.Controllers
 
                 await _insurancePolicyRepository.AddAsync(policyRequest.InsurancePolicy);
                 await _insurancePolicyRepository.SaveAsync();
+
+                _messagePublisher.Publish(policyRequest.InsurancePolicy);
                 return Ok(policyRequest);
             }
             catch (Exception ex)
