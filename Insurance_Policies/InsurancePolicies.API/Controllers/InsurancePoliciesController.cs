@@ -81,7 +81,7 @@ namespace InsurancePolicies.API.Controllers
         }
 
         [HttpGet("id/{policyId}/licenseNumber/{licenseNumber}")]
-        public async Task<ActionResult<InsurancePolicy>> Get(int policyId, string licenseNumber)
+        public async Task<ActionResult<InsurancePolicy>> GetPolicyById(int policyId, string licenseNumber)
         {
             try
             {
