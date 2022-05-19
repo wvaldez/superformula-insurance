@@ -62,16 +62,20 @@ namespace InsurancePolicies.API.Controllers
         }
 
         [HttpGet("licensenumber/{licenseNumber}")]
-        public async Task<ActionResult<List<InsurancePolicy>>> GetPoliciesByLicenseNumber(string licenseNumber, [FromQuery] bool sortByYear = false, [FromQuery] bool includeExpiredPolicies = false)
+        public async Task<ActionResult<List<InsurancePolicy>>> GetPoliciesByLicenseNumber(string licenseNumber, [FromQuery] bool sortDescByYear = false, [FromQuery] bool includeExpiredPolicies = false)
         {
             try
             {
                 var result = _insurancePolicyRepository.GetAll().Where(x => x.LicenseNumber.Equals(licenseNumber));
-                if (sortByYear)
+                if (sortDescByYear)
                 {
-                    result = result.OrderBy(x => x.VehicleDetail.Year);
+                    result = result.OrderByDescending(x => x.VehicleDetail.Year);
                 }
                 if (includeExpiredPolicies)
+                {
+                    result = result.Where(x => x.ExpirationDate < DateTime.Now);
+                }
+                else
                 {
                     result = result.Where(x => x.ExpirationDate > DateTime.Now);
                 }

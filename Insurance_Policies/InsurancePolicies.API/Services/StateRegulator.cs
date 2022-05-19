@@ -9,6 +9,9 @@ namespace InsurancePolicies.API.Services
     {
         public Task<StateRegulationResult> ValidRegulation(InsurancePolicy policy)
         {
+            // Testing purpose, validate synchronous functionality
+            Task.Delay(2000).Wait();
+
             var validationResult = new StateRegulationResult { Reason = "Failed regulation due to invalid data", Status = false };
             if (new Random().Next(1, 2) == 1)
             {

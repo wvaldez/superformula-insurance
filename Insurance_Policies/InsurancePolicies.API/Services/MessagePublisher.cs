@@ -22,7 +22,9 @@ namespace InsurancePolicies.API.Services
 
         public async Task Publish<T>(T obj)
         {
+            // Testing purpose, validate asynchronous functionality
             await Task.Delay(10000);
+
             var raw = JsonConvert.SerializeObject(obj);
             var message = new ServiceBusMessage(Encoding.UTF8.GetBytes(raw));
             await _serviceBusSender.SendMessageAsync(message);

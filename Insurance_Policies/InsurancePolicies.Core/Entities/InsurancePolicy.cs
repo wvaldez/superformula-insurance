@@ -17,7 +17,7 @@ namespace InsurancePolicies.Core.Entities
         public Address Address { get; set; }
         public DateTime ExpirationDate { get; set; }
         public double Premium { get; set; }
-        public Guid VehicleDetailId { get; set; }
+        public int VehicleDetailId { get; set; }
         public Vehicle VehicleDetail { get; set; }
     }
 }
